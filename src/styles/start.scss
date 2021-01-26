@@ -1,0 +1,10 @@
+@import "~bulma/sass/utilities/_all";
+
+@import '_variables.scss';
+
+// Setup $colors to use as bulma classes (e.g. 'is-twitter')
+@import '_colors.scss';
+
+// Import Bulma and Buefy styles
+@import "~bulma";
+@import "~buefy/src/scss/buefy";
