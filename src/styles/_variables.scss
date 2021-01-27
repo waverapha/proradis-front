@@ -1,6 +1,23 @@
-$primary: #8c67ef;
+$primary: #0B2645;
 $primary-light: findLightColor($primary);
 $primary-dark: findDarkColor($primary);
 $primary-invert: findColorInvert($primary);
+
+$secondary: #02DBFF;
+$secondary-light: findLightColor($secondary);
+$secondary-dark: findDarkColor($secondary);
+$secondary-invert: findColorInvert($secondary);
+
+$grey: #888888;
+
+$light-grey: findLightColor($grey);
+$dark-grey: findDarkColor($grey);
+
 $twitter: #4099FF;
 $twitter-invert: findColorInvert($twitter);
+
+$button-color: $white;
+$button-background-color: $primary;
+$button-hover-color: $secondary;
+$button-focus-color: $primary-dark;
+$button-active-color: $primary-dark;

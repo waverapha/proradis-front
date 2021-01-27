@@ -8,3 +8,8 @@
 // Import Bulma and Buefy styles
 @import "~bulma";
 @import "~buefy/src/scss/buefy";
+
+@import '_reset.scss';
+@import 'main.scss';
+@import 'patient-panel.scss';
+@import 'text-editor.scss';

@@ -26,6 +26,17 @@ $colors: mergeColorMaps(
             $primary-light,
             $primary-dark,
         ),
+        "secondary": (
+            $secondary,
+            $secondary-invert,
+            $secondary-light,
+            $secondary-dark,
+        ),
+        "grey": (
+            $grey,
+            $light-grey,
+            $dark-grey,
+        ),
         "link": (
             $link,
             $link-invert,
