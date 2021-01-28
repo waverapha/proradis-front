@@ -1,5 +1,16 @@
 .text-editor-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding: 15px 30px;
     margin-left: 15px;
     background: #fff;
     box-shadow: 1px 1px 5px rgba($grey, $alpha: 0.25);
+
+    >.quillWrapper{
+        display: flex;
+        flex-direction: column;
+        height: 85%;
+    }
 }

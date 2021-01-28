@@ -2,11 +2,12 @@ import Vue from 'vue'
 import App from './App.vue'
 import store from './store'
 
-import { Button, Field, Input, Icon } from 'buefy'
+import { Button, Field, Input, Select, Icon } from 'buefy'
 
 Vue.use(Button);
-Vue.use(Input);
 Vue.use(Field);
+Vue.use(Input);
+Vue.use(Select);
 Vue.use(Icon);
 
 Vue.config.productionTip = false

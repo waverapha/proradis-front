@@ -5,7 +5,7 @@
       <div class="patient-panels">
 
         <div class="panel patient-panel">
-          <p class="panel-heading">Novos</p>
+          <p class="panel-heading">Pacientes</p>
 
           <ul class="patient-panel-list">
             <li
@@ -20,12 +20,12 @@
           <div class="panel-block patient-panel-footer">
             <b-button
             icon-left="plus"
-            @click="addPatient()">Novo paciente</b-button>
+            @click="storePatient()">Novo paciente</b-button>
           </div>
         </div>
 
         <div class="panel patient-panel">
-          <p class="panel-heading">Atendidos</p>
+          <p class="panel-heading">Prontuários</p>
 
           <ul class="patient-panel-list">
             <li
@@ -35,7 +35,7 @@
               <span class="patient-name is-size-7">{{ medicalAppointment.patient.data.name }}</span>
               <b-button
               size="is-small"
-              @click="fetchPacientMedicalAppointment(medicalAppointment.id, medicalAppointment.patient.data.id)">Ver Consulta</b-button>
+              @click="selectMedicalAppointment(medicalAppointment)">Ver Consulta</b-button>
             </li>
           </ul>
         </div>
@@ -43,12 +43,16 @@
       </div>
 
       <div class="text-editor-container">
-        <b-field label="Message">
-            <b-input
-            maxlength="1000"
-            type="textarea"
-            v-model="selectedMedicalAppointment.record"></b-input>
-        </b-field>
+        <h3 class="is-size-4">{{ textEditorTitle }}</h3>
+
+        <text-editor
+        :medicalAppointment="selectedMedicalAppointment"
+        ></text-editor>
+
+        <button class="button"
+        @click="updateMedicalAppointment()"
+        :loading="!isLoadingUpdate"
+        :disabled="!hasSelectedMedicalAppointment || !hasSelectedPatient">Salvar consulta</button>
       </div>
 
     </main>
@@ -57,20 +61,32 @@
 
 <script>
 
+import TextEditor from './components/TextEditor.vue';
+
 export default {
   name: 'App',
 
+  components: {
+    TextEditor
+  },
+
   created(){
+    TextEditor
     this.fetchPatients();
     this.fetchMedicalAppointments();
   },
 
   data(){
     return {
+      isLoadingUpdate: false,
       patients: [],
       medicalAppointments: [],
+      selectedPatient: {
+        name: '',
+      },
       selectedMedicalAppointment: {
         id: null,
+        patient_id: null,
         record: '',
         created_at: null,
         updated_at: null,
@@ -107,7 +123,7 @@ export default {
       });
     },
 
-    addPatient(){
+    storePatient(){
       const data = {
         name: 'Bla',
         document: '23866788061',
@@ -128,9 +144,55 @@ export default {
         console.log(patient);
       })
       .catch(error => {
-        console.log('oiusa');
         console.log(error);
       });
+    },
+
+    updateMedicalAppointment(){
+      const headers = new Headers;
+      headers.append('Content-type', 'application/json');
+
+      const medicalAppointment = this.selectedMedicalAppointment;
+
+      const data = {
+        record: medicalAppointment.record
+      };
+
+      this.isLoadingUpdate = true;
+
+      fetch(`http://localhost:9000/patients/${medicalAppointment.patient_id}/medical-appointments/${medicalAppointment.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers
+      })
+      .then(response => response.json())
+      .then(patient => {
+        console.log(patient);
+        this.isLoadingUpdate = false;
+      })
+      .catch(error => {
+        console.log(error);
+        this.isLoadingUpdate = false;
+      });
+    },
+
+    selectMedicalAppointment(medicalAppointment){
+      this.selectedPatient.name = medicalAppointment.patient.data.name;
+      this.fetchPacientMedicalAppointment(medicalAppointment.id, medicalAppointment.patient.data.id);
+    }
+  },
+
+  computed: {
+    hasSelectedMedicalAppointment(){
+      return this.selectedMedicalAppointment.id !== null;
+    },
+
+    hasSelectedPatient(){
+      return this.selectedPatient.name !== null;
+    },
+
+    textEditorTitle(){
+      return ( this.selectedPatient.name ) ? `Paciente: ${this.selectedPatient.name}` : 'Selecione um paciente ou prontuário';
     }
   }
 }
