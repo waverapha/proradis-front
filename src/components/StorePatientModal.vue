@@ -66,6 +66,7 @@
         <b-button
           label="Cadastrar paciente"
           icon-left="plus"
+          :loading="isSending"
           @click="storePatient()">Novo paciente</b-button>
       </footer>
 
@@ -76,9 +77,13 @@
 </template>
 
 <script>
+
+import patientRespository from '@/repository/patient';
+
 export default {
   data(){
     return {
+      isSending: false,
       patient: {
         name: '',
         birthdate: '',
@@ -107,28 +112,20 @@ export default {
   },
 
   methods: {
-    storePatient(){
-      const data = this.patient;
+    async storePatient(){
+      this.isSending = true;
+      
+      try{
+        const patientData = this.patient;
 
-      const headers = new Headers;
-      headers.append('Content-type', 'application/json');
+        await patientRespository.store(patientData);
 
-      fetch('http://localhost:9000/patients', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers
-      })
-      .then(response => response.json())
-      .then(patient => {
         this.clearForm();
-        console.log(patient);
-      })
-      .catch(error => {
-        console.log(error);
-      })
-      .finally(() => {
-        
-      });
+      } catch(e){
+        console.log(e);
+      } finally{
+        this.isSending = false;
+      }
     },
 
     clearForm(){

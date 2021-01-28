@@ -3,6 +3,9 @@ import Vuex from 'vuex'
 
 import { getField, updateField } from 'vuex-map-fields';
 
+import patientRespository from '@/repository/patient';
+import medicalAppointmentRespository from '@/repository/medical-appointment';
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -63,13 +66,29 @@ export default new Vuex.Store({
       dispatch('fetchPacientMedicalAppointment', medicalAppointment);
     },
 
-    fetchPatients({ commit }){
+    async fetchPatients({ commit }){
       commit('SET_LOADING_STATE', {
         type: 'patientsList',
         value: true
       });
 
-      fetch('http://localhost:9000/patients')
+      try{
+        const {data} = await patientRespository.all();
+
+        commit('SET_PATIENTS', data.data);
+
+      }
+      catch(e){
+        console.log(e);
+      }
+      finally{
+        commit('SET_LOADING_STATE', {
+          type: 'patientsList',
+          value: false
+        });
+      }
+
+      /*fetch('http://localhost:9000/patients')
       .then(response => response.json())
       .then(patients => {
         commit('SET_PATIENTS', patients.data);
@@ -79,116 +98,102 @@ export default new Vuex.Store({
           type: 'patientsList',
           value: false
         });
-      })
+      })*/
     },
 
-    fetchMedicalAppointments({ commit }){
+    async fetchMedicalAppointments({ commit }){
       commit('SET_LOADING_STATE', {
         type: 'medicalAppointmentsList',
         value: true
       });
 
-      fetch('http://localhost:9000/medical-appointments?include=patient')
-      .then(response => response.json())
-      .then(medicalAppointments => {
-        commit('SET_MEDICAL_APPOINTMENTS', medicalAppointments.data);
-      })
-      .finally(() => {
+      try{
+        const {data} = await medicalAppointmentRespository.all('patient');
+
+        commit('SET_MEDICAL_APPOINTMENTS', data.data);
+      }
+      catch(e){
+        console.log(e);
+      }
+      finally{
         commit('SET_LOADING_STATE', {
           type: 'medicalAppointmentsList',
           value: false
         });
-      })
+      }
     },
 
-    fetchPacientMedicalAppointment({ commit }, {id, patient_id, patient}){
-      fetch(`http://localhost:9000/patients/${patient_id}/medical-appointments/${id}`)
-      .then(response => response.json())
-      .then(medicalAppointment => {
-        const {record} = medicalAppointment.data;
+    async fetchPacientMedicalAppointment({ commit }, medicalAppointment){
+      
+      try{
+        const {data} = await patientRespository.medicalAppointments(medicalAppointment.patient_id, medicalAppointment.id);
+
+        const {id, patient_id, record} = data.data;
 
         commit('SET_SELECTED_MEDICAL_APPOINTMENT', {
           id,
           patient_id,
           record,
-          name: patient.data.name
+          name: medicalAppointment.patient.data.name
         });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+      } catch(e){
+        console.log(e);
+      }
     },
 
-    storeMedicalAppointment({ commit, dispatch, state }){
+    async storeMedicalAppointment({ commit, dispatch, state }){
       commit('SET_LOADING_STATE', {
         type: 'saveMedicalAppointment',
-        value: true
+        value: false
       });
-      
-      const headers = new Headers;
-      headers.append('Content-type', 'application/json');
 
-      const medicalAppointment = state.selectedMedicalAppointment;
+      try{
+        const medicalAppointment = state.selectedMedicalAppointment;
+        
+        const medicalAppointmentData = {
+          record: medicalAppointment.record
+        };
 
-      const data = {
-        record: medicalAppointment.record
-      };
+        await patientRespository.storeMedicalAppointment(medicalAppointment.patient.id, medicalAppointmentData);
+        dispatch('fetchMedicalAppointments');
 
-      fetch(`http://localhost:9000/patients/${medicalAppointment.patient.id}/medical-appointments`, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers
-      })
-      .then(response => response.json())
-      .then(patient => {
-        console.log(patient);
-      })
-      .catch(error => {
-        console.log(error);
-      })
-      .finally(() => {
+      } catch(e){
+        console.log(e);
+
+      } finally{
         dispatch('clearMedicalAppointment');
         commit('SET_LOADING_STATE', {
           type: 'saveMedicalAppointment',
           value: false
         });
-      });
+      }
     },
 
-    updateMedicalAppointment({ commit, dispatch, state }){
+    async updateMedicalAppointment({ commit, dispatch, state }){
       commit('SET_LOADING_STATE', {
         type: 'saveMedicalAppointment',
         value: true
       });
 
-      const headers = new Headers;
-      headers.append('Content-type', 'application/json');
+      try{
+        const medicalAppointment = state.selectedMedicalAppointment;
 
-      const medicalAppointment = state.selectedMedicalAppointment;
+        const medicalAppointmentData = {
+          record: medicalAppointment.record
+        };
 
-      const data = {
-        record: medicalAppointment.record
-      };
+        await patientRespository.updateMedicalAppointment(medicalAppointment.patient.id, medicalAppointment.id, medicalAppointmentData);
 
-      fetch(`http://localhost:9000/patients/${medicalAppointment.patient.id}/medical-appointments/${medicalAppointment.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        headers
-      })
-      .then(response => response.json())
-      .then(patient => {
-        console.log(patient);
-      })
-      .catch(error => {
-        console.log(error);
-      })
-      .finally(() => {
+      } catch(e){
+        console.log(e);
+
+      } finally{
         dispatch('clearMedicalAppointment');
         commit('SET_LOADING_STATE', {
           type: 'saveMedicalAppointment',
           value: false
         });
-      });
+      }
     },
 
     clearMedicalAppointment({ commit }){
