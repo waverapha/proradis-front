@@ -1,7 +1,7 @@
 <template>
   <div class="modal-card" style="width: auto">
 
-    <form>
+    <form @submit.stop.prevent="storePatient()" style="overflow-y: auto">
 
       <header class="modal-card-head has-background-secondary">
         <p class="modal-card-title has-text-white">Novo paciente</p>
@@ -14,32 +14,37 @@
 
       <section class="modal-card-body">
 
-        <b-field label="Nome">
+        <!-- :custom-class="{'is-danger': !$v.patient.name.required}" -->
+
+        <b-field label="Nome"
+        :type="{'is-danger': !$v.patient.name.required && $v.patient.name.$error}"
+        :message="{'Preencha esse campo': $v.patient.name.$error}">
           <b-input
+          :has-counter="false"
           placeholder="Digite o nome"
-          v-model="patient.name"
-          required
-          minlength="3"
+          v-model.trim="patient.name"
           maxlength="255"
           ></b-input>
         </b-field>
 
-        <b-field label="Data de Nascimento">
+        <b-field label="Data de Nascimento"
+        :type="{'is-danger': !$v.patient.birthdate.required && $v.patient.birthdate.$error}"
+        :message="{'Preencha esse campo': $v.patient.birthdate.$error}">
           <b-input
+          :has-counter="false"
           placeholder="Digite a data de nascimento"
           v-model="patient.birthdate"
-          required
-          minlength="10"
           maxlength="10"
           v-mask="'##/##/####'"
           ></b-input>
         </b-field>
 
-        <b-field label="Gênero">
+        <b-field label="Gênero"
+        :type="{'is-danger': !$v.patient.gender.required && $v.patient.gender.$error}"
+        :message="{'Escolha um item da lista': $v.patient.gender.$error}">
           <b-select
           expanded
           placeholder="Selecione um gênero"
-          required
           v-model="patient.gender">
             <option
             v-for="gender in genders"
@@ -48,12 +53,13 @@
           </b-select>
         </b-field>
 
-        <b-field label="CPF">
+        <b-field label="CPF"
+        :type="{'is-danger': !$v.patient.document.required && $v.patient.document.$error}"
+        :message="{'Preencha esse campo': $v.patient.document.$error}">
           <b-input
+          :has-counter="false"
           placeholder="Digite o CPF"
           v-model="patient.document"
-          required
-          minlength="14"
           maxlength="14"
           v-mask="'###.###.###-##'"
           ></b-input>
@@ -66,10 +72,10 @@
           @click="$emit('close')">
         </b-button>
         <b-button
+          native-type="submit"
           label="Cadastrar paciente"
           icon-left="plus"
-          :loading="isSending"
-          @click="storePatient()">Novo paciente</b-button>
+          :loading="isSending">Novo paciente</b-button>
       </footer>
 
     </form>
@@ -80,6 +86,8 @@
 
 <script>
 
+import { required, minLength, maxLength } from 'vuelidate/lib/validators'
+
 import patientRespository from '@/repository/patient';
 
 export default {
@@ -87,10 +95,10 @@ export default {
     return {
       isSending: false,
       patient: {
-        name: '',
-        birthdate: '',
-        gender: null,
-        document: '',
+        name: 'Rapha V',
+        birthdate: '02/04/1987',
+        gender: 'M',
+        document: '123.456.789-00',
       },
       genders: [
         {
@@ -115,30 +123,67 @@ export default {
 
   methods: {
     async storePatient(){
+
+      this.$v.$touch();
+
+      if (this.$v.$invalid) {
+        return;
+      }
+
       this.isSending = true;
       
       try{
-        const patientData = this.patient;
+        const patientData = Object.assign({}, this.patient);
 
         patientData.document = patientData.document.replace(/\.|-/g, '');
 
         await patientRespository.store(patientData);
 
         this.clearForm();
-      } catch(e){
-        console.log(e);
+
+        this.$v.$reset();
+
+        this.$emit('close');
+
+      } catch(error){
+        error;
       } finally{
         this.isSending = false;
       }
     },
 
     clearForm(){
-      for (const key in this.patient) {
-        if (Object.hasOwnProperty.call(this.patient, key)) {
-          this.patient[key] = null;
+      const patient = this.patient;
+      for (const key in patient) {
+        if (Object.hasOwnProperty.call(patient, key)) {
+          patient[key] = null;
         }
       }
     }
   },
+
+  validations: {
+    patient: {
+      name: {
+        required,
+        minLength: minLength(3),
+        maxLength: maxLength(255)
+      },
+      birthdate: {
+        required,
+        minLength: minLength(10),
+        maxLength: maxLength(10)
+      },
+      gender: {
+        required,
+        minLength: minLength(1)
+      },
+      document: {
+        required,
+        minLength: minLength(14),
+        maxLength: maxLength(14)
+      }
+    }
+  }
 }
 </script>
