@@ -1,7 +1,7 @@
 <template>
 
   <vue-editor
-  v-model="medicalAppointment.record"
+  v-model="selectedMedicalAppointment.record"
   :editorToolbar="customToolbar"
   placeholder="Digite aqui o prontuário do paciente"></vue-editor>
 
@@ -9,17 +9,11 @@
 
 <script>
 import { VueEditor } from 'vue2-editor';
+import { mapState } from 'vuex';
 
 export default {
   components: {
     VueEditor
-  },
-
-  props: {
-    medicalAppointment: {
-      type: Object,
-      required: true
-    }
   },
 
   data(){
@@ -40,5 +34,11 @@ export default {
         ]
     }
   },
+
+  computed: {
+    ...mapState([
+      'selectedMedicalAppointment'
+    ])
+  }
 }
 </script>

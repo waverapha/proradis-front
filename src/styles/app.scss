@@ -1,0 +1,6 @@
+#app{
+    display: grid;
+    padding: 15px;
+    grid-template-rows: calc(100vh - 30px);
+    grid-template-columns: minmax(275px, 400px) 1fr;
+}

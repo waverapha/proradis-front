@@ -1,191 +1,54 @@
 <template>
   <div id="app">
-    <main>
+    <aside class="aside-list-panels">
 
-      <div class="patient-panels">
+      <patients-panel></patients-panel>
 
-        <div class="panel patient-panel">
-          <p class="panel-heading">Pacientes</p>
+      <medical-appointments-panel></medical-appointments-panel>
 
-          <ul class="patient-panel-list">
-            <li
-            class="panel-block patient-panel-list-item"
-            v-for="patient in patients"
-            :key="patient.id">
-              <span class="patient-name is-size-7">{{ patient.name }}</span>
-              <b-button size="is-small">Nova Consulta</b-button>
-            </li>
-          </ul>
+    </aside>
 
-          <div class="panel-block patient-panel-footer">
-            <b-button
-            icon-left="plus"
-            @click="isComponentModalActive = true">Novo paciente</b-button>
-          </div>
-        </div>
+    <base-main></base-main>
 
-        <div class="panel patient-panel">
-          <p class="panel-heading">Prontuários</p>
-
-          <ul class="patient-panel-list">
-            <li
-            class="panel-block patient-panel-list-item"
-            v-for="medicalAppointment in medicalAppointments"
-            :key="medicalAppointment.id">
-              <span class="patient-name is-size-7">{{ medicalAppointment.patient.data.name }}</span>
-              <b-button
-              size="is-small"
-              @click="selectMedicalAppointment(medicalAppointment)">Ver Consulta</b-button>
-            </li>
-          </ul>
-        </div>
-
-      </div>
-
-      <div class="text-editor-container">
-        <h3 class="is-size-4">{{ textEditorTitle }}</h3>
-
-        <text-editor
-        :medicalAppointment="selectedMedicalAppointment"
-        ></text-editor>
-
-        <button class="button"
-        @click="updateMedicalAppointment()"
-        :loading="!isLoadingUpdate"
-        :disabled="!hasSelectedMedicalAppointment || !hasSelectedPatient">Salvar consulta</button>
-      </div>
-
-      <b-modal
-            v-model="isComponentModalActive"
-            has-modal-card
-            trap-focus
-            :destroy-on-hide="false"
-            aria-role="dialog"
-            aria-label="Example Modal"
-            aria-modal
-            scroll="keep">
-            <template #default="props">
-                <create-patient-modal @close="props.close"></create-patient-modal>
-            </template>
-        </b-modal>
-
-    </main>
+    <b-modal
+      v-model="isStorePatientModalActive"
+      has-modal-card
+      trap-focus
+      :destroy-on-hide="false"
+      aria-role="dialog"
+      aria-label="Modal para adição de paciente"
+      aria-modal
+      scroll="keep">
+      <template v-slot="props">
+          <store-patient-modal @close="props.close"></store-patient-modal>
+      </template>
+    </b-modal>
   </div>
 </template>
 
 <script>
 
-import TextEditor from './components/TextEditor.vue';
-import CreatePatientModal from './components/CreatePatientModal.vue';
+import StorePatientModal from '@/components/StorePatientModal.vue';
+import BaseMain from '@/components/BaseMain.vue';
+import MedicalAppointmentsPanel from '@/components/MedicalAppointmentsPanel.vue';
+import PatientsPanel from '@/components/PatientsPanel.vue';
+
+import { mapState } from 'vuex';
 
 export default {
   name: 'App',
 
   components: {
-    TextEditor,
-    CreatePatientModal
-  },
-
-  created(){
-    TextEditor
-    this.fetchPatients();
-    this.fetchMedicalAppointments();
-  },
-
-  data(){
-    return {
-      isComponentModalActive: false,
-      isLoadingUpdate: false,
-      patients: [],
-      medicalAppointments: [],
-      selectedPatient: {
-        name: '',
-      },
-      selectedMedicalAppointment: {
-        id: null,
-        patient_id: null,
-        record: '',
-        created_at: null,
-        updated_at: null,
-        deleted_at: null
-      }
-    }
-  },
-
-  methods: {
-    fetchPatients(){
-      fetch('http://localhost:9000/patients')
-      .then(response => response.json())
-      .then(patients => {
-        this.patients = patients.data;
-      })
-    },
-
-    fetchMedicalAppointments(){
-      fetch('http://localhost:9000/medical-appointments?include=patient')
-      .then(response => response.json())
-      .then(medicalAppointments => {
-        this.medicalAppointments = medicalAppointments.data;
-      })
-    },
-
-    fetchPacientMedicalAppointment(id, patient){
-      fetch(`http://localhost:9000/patients/${patient}/medical-appointments/${id}`)
-      .then(response => response.json())
-      .then(medicalAppointment => {
-        this.selectedMedicalAppointment = medicalAppointment.data;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-    },
-
-    updateMedicalAppointment(){
-      const headers = new Headers;
-      headers.append('Content-type', 'application/json');
-
-      const medicalAppointment = this.selectedMedicalAppointment;
-
-      const data = {
-        record: medicalAppointment.record
-      };
-
-      this.isLoadingUpdate = true;
-
-      fetch(`http://localhost:9000/patients/${medicalAppointment.patient_id}/medical-appointments/${medicalAppointment.id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data),
-        headers
-      })
-      .then(response => response.json())
-      .then(patient => {
-        console.log(patient);
-        this.isLoadingUpdate = false;
-      })
-      .catch(error => {
-        console.log(error);
-        this.isLoadingUpdate = false;
-      });
-    },
-
-    selectMedicalAppointment(medicalAppointment){
-      this.selectedPatient.name = medicalAppointment.patient.data.name;
-      this.fetchPacientMedicalAppointment(medicalAppointment.id, medicalAppointment.patient.data.id);
-    }
+    BaseMain,
+    StorePatientModal,
+    MedicalAppointmentsPanel,
+    PatientsPanel,
   },
 
   computed: {
-    hasSelectedMedicalAppointment(){
-      return this.selectedMedicalAppointment.id !== null;
-    },
-
-    hasSelectedPatient(){
-      return this.selectedPatient.name !== null;
-    },
-
-    textEditorTitle(){
-      return ( this.selectedPatient.name ) ? `Paciente: ${this.selectedPatient.name}` : 'Selecione um paciente ou prontuário';
-    }
+    ...mapState([
+      'isStorePatientModalActive'
+    ])
   }
 }
 </script>

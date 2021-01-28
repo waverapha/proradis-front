@@ -1,6 +1,17 @@
 main{
-    display: grid;
-    padding: 15px;
-    grid-template-rows: calc(100vh - 30px);
-    grid-template-columns: minmax(275px, 400px) 1fr;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    padding: 15px 30px;
+    margin-left: 15px;
+    background: #fff;
+    box-shadow: 0 0 3px rgba($grey, $alpha: 0.5);
+
+    >.quillWrapper{
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        margin: 15px 0;
+    }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="modal-card" style="width: auto">
 
-    <form ref="storePatientForm">
+    <form>
 
       <header class="modal-card-head has-background-secondary">
         <p class="modal-card-title has-text-white">Novo paciente</p>
@@ -108,9 +108,6 @@ export default {
 
   methods: {
     storePatient(){
-      if( !document.querySelector('form').checkValidity() ){
-        document.querySelector('form').reportValidity();
-      }
       const data = this.patient;
 
       const headers = new Headers;
