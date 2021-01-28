@@ -1,6 +1,6 @@
 <template>
   <main>
-    <h3 class="is-size-4">{{ mainTitle }}</h3>
+    <h3 class="is-size-4">{{ mainTitle }} <span v-if="hasMedicalRecord">Prontuário: {{ medicalRecord }}</span></h3>
 
     <text-editor></text-editor>
 

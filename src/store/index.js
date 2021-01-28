@@ -236,8 +236,19 @@ export default new Vuex.Store({
 
     mainTitle(state){
       const name = state.selectedMedicalAppointment.patient.name;
+      const medicalRecord = state.selectedMedicalAppointment.id;
 
-      return ( name !== null ) ? `Paciente: ${name}` : 'Selecione um paciente ou prontuário';
+      let title = 'Selecione um paciente ou prontuário';
+
+      if( name !== null ){
+        title = `Paciente: ${name}`;
+      }
+
+      if( medicalRecord !== null ){
+        title += ` - Prontuário ${medicalRecord}`;
+      }
+
+      return title;
     },
 
     allowsMedicalAppointmentOperation(state, getters){

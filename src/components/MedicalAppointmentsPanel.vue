@@ -9,10 +9,11 @@
     <aside-panel-list
     v-if="!loading.medicalAppointmentsList"
     :list="medicalAppointments.data"
+    :selected="selectedMedicalAppointment.id"
     button-text="Ver Consulta"
     @list-item-click="handleUpdateMedicalAppointment($event)">
       <template v-slot="slotProps">
-        <span class="patient-name is-size-7">{{ slotProps.item.patient.data.name }}</span>
+        <span class="patient-name is-size-7">{{ slotProps.item.patient.data.name }} (Prontuário: {{ slotProps.item.id }})</span>
       </template>
     </aside-panel-list>
 
@@ -53,6 +54,7 @@ export default {
 
   computed: {
     ...mapState([
+      'selectedMedicalAppointment',
       'medicalAppointments',
       'loading'
     ])
