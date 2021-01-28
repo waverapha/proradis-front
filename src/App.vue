@@ -20,7 +20,7 @@
           <div class="panel-block patient-panel-footer">
             <b-button
             icon-left="plus"
-            @click="storePatient()">Novo paciente</b-button>
+            @click="isComponentModalActive = true">Novo paciente</b-button>
           </div>
         </div>
 
@@ -55,6 +55,20 @@
         :disabled="!hasSelectedMedicalAppointment || !hasSelectedPatient">Salvar consulta</button>
       </div>
 
+      <b-modal
+            v-model="isComponentModalActive"
+            has-modal-card
+            trap-focus
+            :destroy-on-hide="false"
+            aria-role="dialog"
+            aria-label="Example Modal"
+            aria-modal
+            scroll="keep">
+            <template #default="props">
+                <create-patient-modal @close="props.close"></create-patient-modal>
+            </template>
+        </b-modal>
+
     </main>
   </div>
 </template>
@@ -62,12 +76,14 @@
 <script>
 
 import TextEditor from './components/TextEditor.vue';
+import CreatePatientModal from './components/CreatePatientModal.vue';
 
 export default {
   name: 'App',
 
   components: {
-    TextEditor
+    TextEditor,
+    CreatePatientModal
   },
 
   created(){
@@ -78,6 +94,7 @@ export default {
 
   data(){
     return {
+      isComponentModalActive: false,
       isLoadingUpdate: false,
       patients: [],
       medicalAppointments: [],
@@ -117,31 +134,6 @@ export default {
       .then(response => response.json())
       .then(medicalAppointment => {
         this.selectedMedicalAppointment = medicalAppointment.data;
-      })
-      .catch(error => {
-        console.log(error);
-      });
-    },
-
-    storePatient(){
-      const data = {
-        name: 'Bla',
-        document: '23866788061',
-        gender: 'M',
-        birthdate: '02/07/1995'
-      };
-
-      const headers = new Headers;
-      headers.append('Content-type', 'application/json');
-
-      fetch('http://localhost:9000/patients', {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers
-      })
-      .then(response => response.json())
-      .then(patient => {
-        console.log(patient);
       })
       .catch(error => {
         console.log(error);
