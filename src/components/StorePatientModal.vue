@@ -120,20 +120,24 @@ export default {
       })
       .then(response => response.json())
       .then(patient => {
-          this.clearForm();
-          console.log(patient);
+        this.clearForm();
+        console.log(patient);
       })
       .catch(error => {
         console.log(error);
+      })
+      .finally(() => {
+        
       });
     },
 
     clearForm(){
-      this.patient.name = '';
-      this.patient.birthdate = '';
-      this.patient.gender = '';
-      this.patient.document = '';
+      for (const key in this.patient) {
+        if (Object.hasOwnProperty.call(this.patient, key)) {
+          this.patient[key] = null;
+        }
+      }
     }
-  }
+  },
 }
 </script>

@@ -6,16 +6,6 @@
     v-model="loading.patientsList"
     :is-full-page="false"></b-loading>
 
-    <!-- <ul class="aside-list-panel-list" v-if="!loading.patientsList">
-      <li
-      class="panel-block aside-list-panel-list-item"
-      v-for="patient in patients"
-      :key="patient.id">
-        <span class="patient-name is-size-7">{{ patient.name }}</span>
-        <b-button size="is-small" @click="handleStoreMedicalAppointment(patient)">Nova Consulta</b-button>
-      </li>
-    </ul> -->
-
     <aside-panel-list
     v-if="!loading.patientsList"
     :list="patients"
@@ -29,7 +19,7 @@
     <div class="panel-block aside-list-panel-footer">
       <b-button
       icon-left="plus"
-      @click="isStorePatientModalActive = true">Novo paciente</b-button>
+      @click="isStorePatientModalActive = !isStorePatientModalActive">Novo paciente</b-button>
     </div>
   </div>
 </template>
@@ -38,6 +28,7 @@
 import AsidePanelList from '@/components/AsidePanelList';
 
 import { mapActions, mapState } from 'vuex';
+import { mapFields } from 'vuex-map-fields';
 
 export default {
   components: {
@@ -59,8 +50,12 @@ export default {
     ...mapState([
       'patients',
       'loading',
+    ]),
+
+    ...mapFields([
       'isStorePatientModalActive'
     ])
+      
   },
 }
 </script>

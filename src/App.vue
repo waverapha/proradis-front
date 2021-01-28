@@ -33,7 +33,7 @@ import BaseMain from '@/components/BaseMain.vue';
 import MedicalAppointmentsPanel from '@/components/MedicalAppointmentsPanel.vue';
 import PatientsPanel from '@/components/PatientsPanel.vue';
 
-import { mapState } from 'vuex';
+import { mapFields } from 'vuex-map-fields';
 
 export default {
   name: 'App',
@@ -46,9 +46,9 @@ export default {
   },
 
   computed: {
-    ...mapState([
+    ...mapFields([
       'isStorePatientModalActive'
-    ])
+    ]),
   }
 }
 </script>

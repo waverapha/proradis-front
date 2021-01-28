@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+import { getField, updateField } from 'vuex-map-fields';
+
 Vue.use(Vuex)
 
 export default new Vuex.Store({
@@ -42,7 +44,9 @@ export default new Vuex.Store({
       state.selectedMedicalAppointment.patient.id = medicalAppointment.patient_id;
       state.selectedMedicalAppointment.patient.name = medicalAppointment.name;
       state.selectedMedicalAppointment.record = medicalAppointment.record;
-    }
+    },
+
+    updateField,
   },
 
   actions: {
@@ -115,7 +119,7 @@ export default new Vuex.Store({
       });
     },
 
-    storeMedicalAppointment({ commit, state }){
+    storeMedicalAppointment({ commit, dispatch, state }){
       commit('SET_LOADING_STATE', {
         type: 'saveMedicalAppointment',
         value: true
@@ -143,6 +147,7 @@ export default new Vuex.Store({
         console.log(error);
       })
       .finally(() => {
+        dispatch('clearMedicalAppointment');
         commit('SET_LOADING_STATE', {
           type: 'saveMedicalAppointment',
           value: false
@@ -150,7 +155,7 @@ export default new Vuex.Store({
       });
     },
 
-    updateMedicalAppointment({ commit, state }){
+    updateMedicalAppointment({ commit, dispatch, state }){
       commit('SET_LOADING_STATE', {
         type: 'saveMedicalAppointment',
         value: true
@@ -178,15 +183,26 @@ export default new Vuex.Store({
         console.log(error);
       })
       .finally(() => {
+        dispatch('clearMedicalAppointment');
         commit('SET_LOADING_STATE', {
           type: 'saveMedicalAppointment',
           value: false
         });
       });
     },
+
+    clearMedicalAppointment({ commit }){
+      commit('SET_SELECTED_MEDICAL_APPOINTMENT', {
+        id: null,
+        patient_id: null,
+        record: '',
+        name: null,
+      })
+    }
   },
 
   getters: {
+
     operation(state){
       const {id} = state.selectedMedicalAppointment;
 
@@ -212,8 +228,7 @@ export default new Vuex.Store({
 
       return id !== null;
     },
-  },
 
-  modules: {
+    getField,
   }
 })
