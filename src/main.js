@@ -8,16 +8,28 @@ Vue.directive('mask', VueMaskDirective);
 import Vuelidate from 'vuelidate';
 Vue.use(Vuelidate);
 
-import { Button, Field, Input, Select, Icon, Modal, Loading, Toast } from 'buefy'
+import {
+  Button,
+  Field,
+  Input,
+  Select,
+  Icon,
+  Modal,
+  Loading,
+  Toast,
+  Pagination
+} from 'buefy'
 
-Vue.use(Button);
-Vue.use(Field);
-Vue.use(Input);
-Vue.use(Select);
-Vue.use(Icon);
-Vue.use(Modal);
-Vue.use(Loading);
-Vue.use(Toast);
+[Button,
+  Field,
+  Input,
+  Select,
+  Icon,
+  Modal,
+  Loading,
+  Toast,
+  Pagination]
+  .forEach((componentElement) => Vue.use(componentElement));
 
 Vue.config.productionTip = false
 

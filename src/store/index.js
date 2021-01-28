@@ -10,8 +10,39 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    patients: [],
-    medicalAppointments: [],
+    patients: {
+      data: [],
+      meta: {
+        pagination: {
+          count: 0,
+          current_page: 1,
+          links: {
+            prev: null,
+            next: null,
+          },
+          per_page: 25,
+          total: 0,
+          total_pages: 0,
+        }
+      }
+    },
+    medicalAppointments: {
+      data: [],
+      meta: {
+        pagination: {
+          count: 0,
+          current_page: 1,
+          links: {
+            prev: null,
+            next: null,
+          },
+          per_page: 25,
+          total: 0,
+          total_pages: 0,
+        }
+      }
+    },
+    medicalAppointmentsMeta: [],
     isStorePatientModalActive: false,
     selectedMedicalAppointment: {
       id: null,
@@ -34,12 +65,14 @@ export default new Vuex.Store({
       state.loading[type] = value;
     },
 
-    SET_PATIENTS(state, patients){
-      state.patients = patients;
+    SET_PATIENTS(state, data){
+      state.patients.data = data.data;
+      state.patients.meta.pagination = data.meta.pagination;
     },
 
-    SET_MEDICAL_APPOINTMENTS(state, medicalAppointments){
-      state.medicalAppointments = medicalAppointments;
+    SET_MEDICAL_APPOINTMENTS(state, data){
+      state.medicalAppointments.data = data.data;
+      state.medicalAppointments.meta.pagination = data.meta.pagination;
     },
 
     SET_SELECTED_MEDICAL_APPOINTMENT(state, medicalAppointment){
@@ -66,17 +99,16 @@ export default new Vuex.Store({
       dispatch('fetchPacientMedicalAppointment', medicalAppointment);
     },
 
-    async fetchPatients({ commit }){
+    async fetchPatients({ commit }, {page}){
       commit('SET_LOADING_STATE', {
         type: 'patientsList',
         value: true
       });
 
       try{
-        const {data} = await patientRespository.all();
+        const response = await patientRespository.all(page);
 
-        commit('SET_PATIENTS', data.data);
-
+        commit('SET_PATIENTS', response.data);
       }
       catch(e){
         console.log(e);
@@ -87,30 +119,18 @@ export default new Vuex.Store({
           value: false
         });
       }
-
-      /*fetch('http://localhost:9000/patients')
-      .then(response => response.json())
-      .then(patients => {
-        commit('SET_PATIENTS', patients.data);
-      })
-      .finally(() => {
-        commit('SET_LOADING_STATE', {
-          type: 'patientsList',
-          value: false
-        });
-      })*/
     },
 
-    async fetchMedicalAppointments({ commit }){
+    async fetchMedicalAppointments({ commit }, {page, include}){
       commit('SET_LOADING_STATE', {
         type: 'medicalAppointmentsList',
         value: true
       });
 
       try{
-        const {data} = await medicalAppointmentRespository.all('patient');
+        const response = await medicalAppointmentRespository.all(page, include);
 
-        commit('SET_MEDICAL_APPOINTMENTS', data.data);
+        commit('SET_MEDICAL_APPOINTMENTS', response.data);
       }
       catch(e){
         console.log(e);

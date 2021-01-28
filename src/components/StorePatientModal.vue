@@ -95,10 +95,10 @@ export default {
     return {
       isSending: false,
       patient: {
-        name: 'Rapha V',
-        birthdate: '02/04/1987',
-        gender: 'M',
-        document: '123.456.789-00',
+        name: '',
+        birthdate: '',
+        gender: null,
+        document: '',
       },
       genders: [
         {

@@ -8,7 +8,7 @@
 
     <aside-panel-list
     v-if="!loading.patientsList"
-    :list="patients"
+    :list="patients.data"
     button-text="Nova Consulta"
     @list-item-click="handleStoreMedicalAppointment($event)">
       <template v-slot="slotProps">
@@ -21,22 +21,30 @@
       icon-left="plus"
       @click="isStorePatientModalActive = !isStorePatientModalActive">Novo paciente</b-button>
     </div>
+
+    <aside-panel-list-pagination
+    :pagination="patients.meta.pagination"
+    @change="fetchPatients({page: $event})"></aside-panel-list-pagination>
   </div>
 </template>
 
 <script>
 import AsidePanelList from '@/components/AsidePanelList';
+import AsidePanelListPagination from '@/components/AsidePanelListPagination.vue';
 
 import { mapActions, mapState } from 'vuex';
 import { mapFields } from 'vuex-map-fields';
 
 export default {
   components: {
-    AsidePanelList
+    AsidePanelList,
+    AsidePanelListPagination
   },
 
   created(){
-    this.fetchPatients();
+    this.fetchPatients({
+      page: 1
+    });
   },
 
   methods: {

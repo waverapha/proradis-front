@@ -3,9 +3,10 @@ import repository from '../repository';
 const moduleURL = '/patients';
 
 export default {
-    all(include = null){
+    all(page = 1, include = null){
         return repository.get(moduleURL, {
             params: {
+                page,
                 include
             }
         });
