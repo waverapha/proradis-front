@@ -31,6 +31,7 @@
           required
           minlength="10"
           maxlength="10"
+          v-mask="'##/##/####'"
           ></b-input>
         </b-field>
 
@@ -54,6 +55,7 @@
           required
           minlength="14"
           maxlength="14"
+          v-mask="'###.###.###-##'"
           ></b-input>
         </b-field>
       </section>
@@ -117,6 +119,8 @@ export default {
       
       try{
         const patientData = this.patient;
+
+        patientData.document = patientData.document.replace(/\.|-/g, '');
 
         await patientRespository.store(patientData);
 

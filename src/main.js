@@ -2,6 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import store from './store'
 
+import { VueMaskDirective } from 'v-mask'
+Vue.directive('mask', VueMaskDirective);
+
 import { Button, Field, Input, Select, Icon, Modal, Loading } from 'buefy'
 
 Vue.use(Button);
